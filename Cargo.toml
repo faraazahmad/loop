@@ -1,0 +1,12 @@
+[package]
+name = "markr"
+version = "0.1.0"
+authors = ["Syed Faraaz Ahmad <faraaz98@live.com>"]
+edition = "2018"
+include = ["src/**/*"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+termion = "1.5.5"
+unicode-segmentation = "1.6.0"
