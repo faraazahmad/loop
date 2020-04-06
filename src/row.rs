@@ -1,6 +1,5 @@
 use std::cmp;
 use unicode_segmentation::UnicodeSegmentation;
-use termion::color;
 
 #[derive(Default)]
 pub struct Row {
@@ -32,26 +31,10 @@ impl Row {
             .skip(start)
             .take(end - start)
         {
-            // if grapheme == "\t" {
-            //     result.push_str("  ");
-            // } else {
-            //     result.push_str(grapheme);
-            // }
-            if let Some(c) = grapheme.chars().next() {
-                if c == '\t' {
-                    result.push_str("  ");
-                } else if c.is_ascii_digit() {
-                    result.push_str(
-                        &format!(
-                            "{}{}{}",
-                            termion::color::Fg(color::Rgb(249, 55, 17)),
-                            c,
-                            color::Fg(color::Reset)
-                        )[..],
-                    );
-                } else {
-                    result.push(c);
-                }
+            if grapheme == "\t" {
+                result.push_str("  ");
+            } else {
+                result.push_str(grapheme);
             }
         }
         result
@@ -112,5 +95,19 @@ impl Row {
 
     pub fn as_bytes(&self) -> &[u8] {
         self.string.as_bytes()
+    }
+
+    pub fn find(&self, query: &str) -> Option<usize> {
+        let matching_byte_index = self.string.find(query);
+        if let Some(matching_byte_index) = matching_byte_index {
+            for (grapheme_index, (byte_index, _)) in 
+                self.string[..].grapheme_indices(true).enumerate()
+            {
+                if matching_byte_index == byte_index {
+                    return Some(grapheme_index);
+                }
+            }
+        }
+        None
     }
 }
