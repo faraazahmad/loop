@@ -1,9 +1,14 @@
+use crate::highlighting;
+
 use std::cmp;
+
+use termion::color;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Default)]
 pub struct Row {
     string: String,
+    highlighting: Vec<highlighting::Type>,
     len: usize,
 }
 
@@ -11,6 +16,7 @@ impl From<&str> for Row {
     fn from(slice: &str) -> Self {
         let mut row = Self {
             string: String::from(slice),
+            highlighting: Vec::new(),
             len: 0,
         };
 
@@ -31,10 +37,21 @@ impl Row {
             .skip(start)
             .take(end - start)
         {
-            if grapheme == "\t" {
-                result.push_str("  ");
-            } else {
-                result.push_str(grapheme);
+            if let Some(c) = grapheme.chars().next() {
+                if c == '\t' {
+                    result.push_str("  ");
+                } else if c.is_ascii_digit() {
+                    result.push_str(
+                        &format!(
+                            "{}{}{}",
+                            color::Fg(color::Rgb(220, 163, 163)),
+                            c,
+                            color::Fg(color::Reset),
+                        )[..],
+                    );
+                } else {
+                    result.push(c);
+                }
             }
         }
         result
@@ -97,17 +114,31 @@ impl Row {
         self.string.as_bytes()
     }
 
-    pub fn find(&self, query: &str) -> Option<usize> {
+    pub fn find(&self, query: &str, after: usize) -> Option<usize> {
+        let substring: String = self.string[..].graphemes(true).skip(after).collect();
         let matching_byte_index = self.string.find(query);
         if let Some(matching_byte_index) = matching_byte_index {
             for (grapheme_index, (byte_index, _)) in 
-                self.string[..].grapheme_indices(true).enumerate()
+                substring[..].grapheme_indices(true).enumerate()
             {
                 if matching_byte_index == byte_index {
+                    #[allow(clippy::integer_arithmetic)]
                     return Some(grapheme_index);
                 }
             }
         }
         None
+    }
+
+    pub fn highlight(&mut self) {
+        let mut highlighting = Vec::new();
+        for c in self.string.chars() {
+            if c.is_ascii_digit() {
+                highlighting.push(highlighting::Type::Number);
+            } else {
+                highlighting.push(highlighting::Type::None);
+            }
+        }
+        self.highlighting = highlighting;
     }
 }

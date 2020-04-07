@@ -13,7 +13,7 @@ const STATUS_BG_COLOR: color::Rgb = color::Rgb(0, 50, 100);
 const STATUS_FG_COLOR: color::Rgb = color::Rgb(255, 255, 255);
 const QUIT_TIMES: u8 = 2;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Position {
     pub x: usize,
     pub y: usize,
@@ -138,6 +138,46 @@ impl Editor {
         }
     }
 
+    /**
+     * Implement Search functionality
+     * Use arrow keys to navigate between search results using arrow keys
+     * Go back to previous position when search is cancelled
+     */
+    fn search(&mut self) {
+        let old_position = self.cursor_position.clone();
+        if let Some(query) = self
+        .prompt(
+            "Search (ESC to cancel, Arrows to navigate): ",
+            |editor, key, query| {
+                let mut moved = false;
+                match key {
+                    Key::Right | Key::Down => {
+                        editor.move_cursor(Key::Right);
+                        moved = true;
+                    },
+                    _ => (),
+                }
+
+                if let Some(position) = editor.document.find(&query, &editor.cursor_position) {
+                    editor.cursor_position = position;
+                    editor.scroll();
+                } else if moved {
+                    editor.move_cursor(Key::Left);
+                }
+        })
+        .unwrap_or(None)
+        {
+            if let Some(position) = self.document.find(&query[..], &old_position) {
+                self.cursor_position = position;
+            } else {
+                self.status_message = StatusMessage::from(format!("Not found :{}", query));
+            }       
+        } else {
+            self.cursor_position = old_position;
+            self.scroll();
+        }
+    }
+
     fn process_kepress(&mut self) -> Result<(), std::io::Error> {
         let pressed_key = Terminal::read_key()?;
         match pressed_key {
@@ -152,23 +192,7 @@ impl Editor {
                 }
                 self.should_quit = true;
             },
-            Key::Ctrl('f') => {
-                if let Some(query) = self
-                .prompt("Search: ", |editor, _, query| {
-                    if let Some(position) = editor.document.find(&query) {
-                        editor.cursor_position = position;
-                        editor.scroll();
-                    }
-                })
-                .unwrap_or(None)
-                {
-                    if let Some(position) = self.document.find(&query[..]) {
-                        self.cursor_position = position;
-                    } else {
-                        self.status_message = StatusMessage::from(format!("Not found :{}", query));
-                    }       
-                }
-            },
+            Key::Ctrl('f') => self.search(),
             Key::Ctrl('s') => self.save(),
             Key::Ctrl('h') => {
                 self.status_message = StatusMessage::from("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit".to_string());

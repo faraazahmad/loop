@@ -17,7 +17,9 @@ impl Document {
         let contents = fs::read_to_string(file_name)?;
         let mut rows = Vec::new();
         for value in contents.lines() {
-            rows.push(Row::from(value));
+            let mut row = Row::from(value);
+            row.highlight();
+            rows.push(row);
         }
 
         Ok(Self {
@@ -107,9 +109,10 @@ impl Document {
         self.dirty
     }
 
-    pub fn find(&self, query: &str) -> Option<Position> {
-        for (y, row) in self.rows.iter().enumerate() {
-            if let Some(x) = row.find(query) {
+    pub fn find(&self, query: &str, after: &Position) -> Option<Position> {
+        let mut x = after.x;
+        for (y, row) in self.rows.iter().enumerate().skip(after.y) {
+            if let Some(x) = row.find(query, x) {
                 return Some(Position { x, y });
             }
         }
