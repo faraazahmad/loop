@@ -3,7 +3,7 @@
 A (simple) text editor than runs in your terminal, built in Rust. This was made using the super awesome
 tutorial written by [@pflenker](https://github.com/pflenker) on his website [here](https://www.philippflenker.com/hecto/).
 
-[![asciicast](https://asciinema.org/a/317801.svg)](https://asciinema.org/a/317801)
+[![asciicast](https://asciinema.org/a/317801.svg)](https://asciinema.org/a/317801?autoplay=1&t=6)
 <p align="center">(Click play to see basic usage)</p>
 
 ## Current features
