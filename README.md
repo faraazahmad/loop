@@ -3,6 +3,8 @@
 A (simple) text editor than runs in your terminal, built in Rust. This was made using the super awesome
 tutorial written by [@pflenker](https://github.com/pflenker) on his website [here](https://www.philippflenker.com/hecto/).
 
+![Loop Editor Screenshot](images/screenshot.png)
+
 ## Current features
 
 * Open file
