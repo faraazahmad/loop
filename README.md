@@ -10,13 +10,33 @@ tutorial written by [@pflenker](https://github.com/pflenker) on his website [her
 * Open file
 * Edit file
 * Save file to disk
-* Search for words in file
+* Search for words in file (forwards and backwards)
 * Warn when quitting editor without saving file.
 
 ## Planned features
 
-* Syntax highlighting
+* Syntax highlighting (WIP)
 * Tab support
 * User defined config file
 * Open folder
 * Directory tree
+
+# Building from source
+
+You need to have Rust installed on your system. You can do so from the
+[official link](https://www.rust-lang.org/tools/install).
+
+To build it, run 
+
+```bash
+$ cargo build
+```
+
+or run it directly using 
+
+```bash
+$ cargo run <path/to/file>
+```
+
+where `<path/to/file>` is the path to the file you want to edit. You can leave it blank if you want to create and edit a new file (filename will be
+asked on save).

@@ -1,5 +1,5 @@
 [package]
-name = "markr"
+name = "loop"
 version = "0.1.0"
 authors = ["Syed Faraaz Ahmad <faraaz98@live.com>"]
 edition = "2018"
